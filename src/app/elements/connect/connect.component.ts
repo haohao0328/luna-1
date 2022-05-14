@@ -313,33 +313,33 @@ export class ElementConnectComponent implements OnInit, OnDestroy {
       return new Promise<ConnectData>((resolve, reject) => {
         reject('没有系统用户');
       });
-    } else if (systemUserMaxPriority.length > 1) {
-      return this.getConnectData(systemUserMaxPriority, node);
-    }
-    // 系统用户等于 1 个的情况
-    const systemUser = systemUserMaxPriority[0];
-    const isRemoteApp = node.meta.type === 'application';
-    const connectTypes = this._appSvc.getProtocolConnectTypes(isRemoteApp)[systemUser.protocol];
-    if (!connectTypes) {
-      alert('没有匹配的连接方式');
-      return new Promise<ConnectData>((resolve, reject) => {
-        reject('没有匹配的连接方式');
-      });
-    }
-    let connectType = null;
-    if (connectTypes && connectTypes.length === 1) {
-      connectType = connectTypes[0];
-    }
-    if (systemUser && connectType && systemUser.login_mode === 'auto') {
-      return new Promise<ConnectData>(resolve => {
-        const outputData = new ConnectData();
-        outputData.systemUser = systemUser;
-        outputData.connectType = connectType;
-        resolve(outputData);
-      });
     } else {
       return this.getConnectData(systemUserMaxPriority, node);
     }
+    // 系统用户等于 1 个的情况
+    // const systemUser = systemUserMaxPriority[0];
+    // const isRemoteApp = node.meta.type === 'application';
+    // const connectTypes = this._appSvc.getProtocolConnectTypes(isRemoteApp)[systemUser.protocol];
+    // if (!connectTypes) {
+    //   alert('没有匹配的连接方式');
+    //   return new Promise<ConnectData>((resolve, reject) => {
+    //     reject('没有匹配的连接方式');
+    //   });
+    // }
+    // let connectType = null;
+    // if (connectTypes && connectTypes.length === 1) {
+    //   connectType = connectTypes[0];
+    // }
+    // if (systemUser && connectType && systemUser.login_mode === 'auto') {
+    //   return new Promise<ConnectData>(resolve => {
+    //     const outputData = new ConnectData();
+    //     outputData.systemUser = systemUser;
+    //     outputData.connectType = connectType;
+    //     resolve(outputData);
+    //   });
+    // } else {
+    //   return this.getConnectData(systemUserMaxPriority, node);
+    // }
   }
 
   createTempAuthIfNeed(node: TreeNode, outputData: ConnectData) {
