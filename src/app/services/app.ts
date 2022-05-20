@@ -61,6 +61,7 @@ export class AppService {
         Object.assign(User, user);
         User.logined = true;
         this._localStorage.set('user', user.id);
+        this._localStorage.set('username', user.username);
       },
       err => {
         // this._logger.error(err);

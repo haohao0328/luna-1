@@ -53,8 +53,10 @@
     </mat-checkbox>
   </div>
 
-  <mat-dialog-actions  style="float: right; margin: 20px 0 10px 0;">
+  <mat-dialog-actions  style="float: right; margin: 20px 0 10px 0;" *ngIf="!loading">
     <button mat-raised-button (click)="onCancel()">{{"Cancel"| translate}}</button>
-    <button mat-raised-button color="primary" type="submit" [mat-dialog-close]="outputData" (click)="onConfirm()">{{"Confirm"| translate}}</button>
+    <button mat-raised-button color="primary" type="submit" (click)="onConfirm()">{{"Confirm"| translate}}</button>
   </mat-dialog-actions>
+
+  <p *ngIf="loading" style="float: right; margin: 20px 0 10px 0;">{{ "Loading"| translate }} ...</p>
 </div>

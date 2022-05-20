@@ -296,4 +296,16 @@ export class HttpService {
     }
     return this.get(url.href).pipe(map(res => Object.assign(new Endpoint(), res))).toPromise();
   }
+
+  getLoginLogs(userId: string, assetId: string) {
+    return this.get(`/external/api/user-asset-logs/user/${userId}/asset/${assetId}/`);
+  }
+
+  postLoginLogs(params: any) {
+    return this.post(`/external/api/user-asset-logs/`, params);
+  }
+
+  postSystemUserTask(query: string, params: any) {
+    return this.post(`/external/api/system-user/tasks/?username=${query}`, params);
+  }
 }
