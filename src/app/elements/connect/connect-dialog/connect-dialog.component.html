@@ -46,16 +46,16 @@
   >
   </elements-advanced-option>
 
-  <div class="auto-connect">
+  <!-- <div class="auto-connect">
     <label class="zone-label" style="display: block">{{ "Remember select" | translate }}</label>
     <mat-checkbox name="auto-login" [(ngModel)]="autoLogin">
       {{ "Automatic login next" | translate }}
     </mat-checkbox>
-  </div>
+  </div> -->
 
   <mat-dialog-actions  style="float: right; margin: 20px 0 10px 0;" *ngIf="!loading">
     <button mat-raised-button (click)="onCancel()">{{"Cancel"| translate}}</button>
-    <button mat-raised-button color="primary" type="submit" (click)="onConfirm()">{{"Confirm"| translate}}</button>
+    <button mat-raised-button color="primary" type="submit" (click)="onCheck()">{{"Confirm"| translate}}</button>
   </mat-dialog-actions>
 
   <p *ngIf="loading" style="float: right; margin: 20px 0 10px 0;">{{ "Loading"| translate }} ...</p>

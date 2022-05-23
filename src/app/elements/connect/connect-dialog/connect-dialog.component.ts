@@ -5,7 +5,6 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {ConnectType, ConnectData, TreeNode, SystemUser, AuthInfo, ConnectOption} from '@app/model';
 import {ElementManualAuthComponent} from './manual-auth/manual-auth.component';
 import {BehaviorSubject} from 'rxjs';
-import { count } from 'console';
 
 @Component({
   selector: 'elements-asset-tree-dialog',
@@ -86,46 +85,55 @@ export class ElementConnectDialogComponent implements OnInit {
     }
   }
 
-  onConfirm() {
-    this.outputData.systemUser = this.systemUserSelected;
+  onCheck() {
     this.outputData.connectType = this.connectType;
     this.outputData.manualAuthInfo = this.manualAuthInfo;
     this.outputData.connectOptions = this.connectOptions;
-
+    this.outputData.systemUser = this.systemUserSelected;
     if (this.autoLogin) {
       this._appSvc.setPreLoginSelect(this.node, this.outputData);
     }
-    this.loading = true;
-    this._http.getLoginLogs(this.userId, this.node.id).subscribe(
-      data => {
-        if (data) {
-          if (data.is_first_login) {
-            this.pushSystemUser();
-          } else {
-            if (data.has_changed_permission) {
+    if (this.outputData.systemUser.name === 'sudo' || this.outputData.systemUser.name  === 'no_sudo' ) {
+      this.loading = true;
+      this._http.getLoginLogs(this.userId, this.node.id).subscribe(
+        data => {
+          if (data) {
+            if (data.is_first_login) {
               this.pushSystemUser();
             } else {
-              this.onSubmit$.next(true);
-              const nodeID = this._appSvc.getNodeTypeID(this.node);
-              this._appSvc.setNodePreferSystemUser(nodeID, this.systemUserSelected.id);
-              this._appSvc.setProtocolPreferLoginType(this.systemUserSelected.protocol, this.connectType.id);
-              this.dialogRef.close(this.outputData);
+              if (data.has_changed_permission) {
+                this.pushSystemUser();
+              } else {
+                this.onConfirm();
+              }
             }
+          } else {
+            const params = {
+              asset_id : this.node.meta.data.id,
+              asset_hostname: this.node.meta.data.hostname,
+              asset_ip: this.node.meta.data.ip,
+              user_id: this.userId,
+              username: this.userName,
+            };
+            this._http.postLoginLogs(params).subscribe( resp => {
+              this.pushSystemUser();
+            });
           }
-        } else {
-          const params = {
-            asset_id : this.node.meta.data.id,
-            asset_hostname: this.node.meta.data.hostname,
-            asset_ip: this.node.meta.data.ip,
-            user_id: this.userId,
-            username: this.userName,
-          };
-          this._http.postLoginLogs(params).subscribe( resp => {
-            this.pushSystemUser();
-          });
-        }
-      }
-    );
+        },
+        err => {
+          alert('推送失败');
+          this.loading = false;
+        });
+    } else {
+      this.onConfirm();
+    }
+  }
+  onConfirm() {
+    this.onSubmit$.next(true);
+    const nodeID = this._appSvc.getNodeTypeID(this.node);
+    this._appSvc.setNodePreferSystemUser(nodeID, this.systemUserSelected.id);
+    this._appSvc.setProtocolPreferLoginType(this.systemUserSelected.protocol, this.connectType.id);
+    this.dialogRef.close(this.outputData);
   }
 
   onAdvancedOptionChanged(evt) {
@@ -141,7 +149,8 @@ export class ElementConnectDialogComponent implements OnInit {
     this._http.postSystemUserTask(this.userName, params).subscribe( () => {
       let count = 0;
       const interval = setInterval(() => {
-        this._http.getLoginLogs(this.userId, this.node.id).subscribe(data => {
+        this._http.getLoginLogs(this.userId, this.node.id).subscribe(
+          data => {
           if (count ++ >= 10) {
             clearInterval(interval);
             alert('推送失败');
@@ -149,11 +158,7 @@ export class ElementConnectDialogComponent implements OnInit {
           }
           if (data.has_pushed) {
             clearInterval(interval);
-            this.onSubmit$.next(true);
-            const nodeID = this._appSvc.getNodeTypeID(this.node);
-            this._appSvc.setNodePreferSystemUser(nodeID, this.systemUserSelected.id);
-            this._appSvc.setProtocolPreferLoginType(this.systemUserSelected.protocol, this.connectType.id);
-            this.dialogRef.close(this.outputData);
+            this.onConfirm();
           }
         });
       }, 3000);
