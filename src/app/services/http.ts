@@ -297,8 +297,8 @@ export class HttpService {
     return this.get(url.href).pipe(map(res => Object.assign(new Endpoint(), res))).toPromise();
   }
 
-  getLoginLogs(userId: string, assetId: string) {
-    return this.get(`/external/api/user-asset-logs/user/${userId}/asset/${assetId}/`);
+  getLoginLogs(userId: string, assetId: string, systemUserId: string) {
+    return this.get(`/external/api/user-asset-logs/user/${userId}/asset/${assetId}/system_user/${systemUserId}/`);
   }
 
   postLoginLogs(params: any) {

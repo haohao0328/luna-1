@@ -95,7 +95,7 @@ export class ElementConnectDialogComponent implements OnInit {
     }
     if (this.outputData.systemUser.name === 'sudo' || this.outputData.systemUser.name  === 'no_sudo' ) {
       this.loading = true;
-      this._http.getLoginLogs(this.userId, this.node.id).subscribe(
+      this._http.getLoginLogs(this.userId, this.node.id, this.outputData.systemUser.id).subscribe(
         data => {
           if (data) {
             if (data.is_first_login) {
@@ -114,6 +114,7 @@ export class ElementConnectDialogComponent implements OnInit {
               asset_ip: this.node.meta.data.ip,
               user_id: this.userId,
               username: this.userName,
+              system_user_id: this.outputData.systemUser.id
             };
             this._http.postLoginLogs(params).subscribe( resp => {
               this.pushSystemUser();
@@ -149,14 +150,14 @@ export class ElementConnectDialogComponent implements OnInit {
     this._http.postSystemUserTask(this.userName, params).subscribe( () => {
       let count = 0;
       const interval = setInterval(() => {
-        this._http.getLoginLogs(this.userId, this.node.id).subscribe(
+        this._http.getLoginLogs(this.userId, this.node.id, this.outputData.systemUser.id).subscribe(
           data => {
-          if (count ++ >= 10) {
+          if (count ++ >= 20) {
             clearInterval(interval);
             alert('推送失败');
             this.loading = false;
           }
-          if (data.has_pushed) {
+          if (data.has_pushed && !data.has_changed_permission) {
             clearInterval(interval);
             this.onConfirm();
           }
