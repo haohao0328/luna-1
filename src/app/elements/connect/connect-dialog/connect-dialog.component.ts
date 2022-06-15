@@ -5,6 +5,7 @@ import {MAT_DIALOG_DATA, MatDialogRef} from '@angular/material';
 import {ConnectType, ConnectData, TreeNode, SystemUser, AuthInfo, ConnectOption} from '@app/model';
 import {ElementManualAuthComponent} from './manual-auth/manual-auth.component';
 import {BehaviorSubject} from 'rxjs';
+import { mergeScan } from 'rxjs-compat/operator/mergeScan';
 
 @Component({
   selector: 'elements-asset-tree-dialog',
@@ -122,7 +123,7 @@ export class ElementConnectDialogComponent implements OnInit {
           }
         },
         err => {
-          alert('推送失败');
+          alert('外置程序接口错误, 请联系管理员');
           this.loading = false;
         });
     } else {
@@ -154,7 +155,11 @@ export class ElementConnectDialogComponent implements OnInit {
           data => {
           if (count ++ >= 20) {
             clearInterval(interval);
-            alert('推送失败');
+            let msg = '推送失败, 请联系管理员\n';
+            if (data.systemUserExecution) {
+              msg += data.systemUserExecution.exception;
+            }
+            alert(msg);
             this.loading = false;
           }
           if (data.has_pushed && !data.has_changed_permission) {
