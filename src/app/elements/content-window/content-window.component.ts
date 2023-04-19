@@ -32,7 +32,7 @@ export class ElementContentWindowComponent implements OnInit {
   createWaterMark() {
     this._settingSvc.createWaterMarkIfNeed(
       this.windowRef.nativeElement,
-      `${User.name}(${User.username})\n${this.view.node.name}`
+      `${User.name}(${User.username})\n${this.view.node.name}\n${this.view.node.meta.data.comment}`
     );
   }
 
